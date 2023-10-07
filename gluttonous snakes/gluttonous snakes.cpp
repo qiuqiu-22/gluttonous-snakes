@@ -4,6 +4,8 @@
 #include<stdlib.h>
 #include<graphics.h>
 
+int flag = 0;
+
 //表示蛇宝宝的方向
 enum DIR
 {
@@ -31,6 +33,12 @@ struct Food
 	bool flag;
 	DWORD color;
 }food;
+
+//主页设置
+void HomePage()
+{
+
+}
 
 //结构体的初始化
 void GameInit()
@@ -82,7 +90,7 @@ void GameDraw()
 
 //让蛇宝宝动起来
 void SnakeMove()
-{
+{	
 	for (int i = snake.size -1; i > 0; i--)
 	{
 		snake.coor[i] = snake.coor[i - 1];
@@ -131,28 +139,28 @@ void KeyControl()
 	{
 		switch (_getch())
 		{
-		case 'w':
+		case 72:
 			if (snake.dir != DOWN)
 			{
 				snake.dir = UP;
 			}
 			break;
 		
-		case 's':
+		case 80:
 			if (snake.dir != UP)
 			{
 				snake.dir = DOWN;
 			}
 			break;
 		
-		case 'a':
+		case 75:
 			if (snake.dir != RIGHT)
 			{
 				snake.dir = LEFT;
 			}
 			break;
 		
-		case 'd':
+		case 77:
 			if (snake.dir != LEFT)
 			{
 				snake.dir = RIGHT;
@@ -179,6 +187,7 @@ void EatFood()
 	{
 		food.flag = false;
 		snake.size++;
+		flag++;
 	}
 
 	if (!food.flag)
@@ -193,9 +202,9 @@ void EatFood()
 }
 
 
-
 int main()
 {
+	
 	GameInit();
 		while (1)
 	{
@@ -203,7 +212,7 @@ int main()
 		SnakeMove();
 		KeyControl();
 		EatFood();
-		Sleep(50);
+		Sleep(60-0.5*flag);
 		//防止退出
 	}
 	return 0;
