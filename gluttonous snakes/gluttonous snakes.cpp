@@ -5,6 +5,7 @@
 #include<graphics.h>
 
 int flag = 0;
+int screen;
 
 //表示蛇宝宝的方向
 enum DIR
@@ -37,7 +38,28 @@ struct Food
 //主页设置
 void HomePage()
 {
+	
+	//主页页面设计
+	initgraph(640, 480, EX_DBLCLKS);
+	
+	//文字
+	wchar_t word1[] = L"按空格开始游戏";
+	wchar_t word2[] = L"上下左右键控制蛇宝宝";
+	wchar_t word3[] = L"按空格暂停";
+	outtextxy(220, 240, word1);
+	outtextxy(220, 280, word2);
+	outtextxy(220, 300, word3);
 
+	while(1)
+		if (_kbhit())
+		{
+			if (_getch() == ' ')
+			{
+				cleardevice();
+				screen = 1;
+				break;
+			}
+		}
 }
 
 //结构体的初始化
@@ -175,6 +197,9 @@ void KeyControl()
 					return;
 				}
 			}
+		case 27:
+			screen = 0;
+			break;
 		}
 	}
 }
@@ -205,15 +230,25 @@ void EatFood()
 int main()
 {
 	
+	HomePage(); 
 	GameInit();
-		while (1)
-	{
-		GameDraw();
-		SnakeMove();
-		KeyControl();
-		EatFood();
-		Sleep(60-0.5*flag);
-		//防止退出
-	}
+
+	while (1)
+		switch (screen)
+		{
+		case 0 :
+			HomePage();
+			cleardevice();
+		case 1 :
+		
+			GameDraw();
+			SnakeMove();
+			KeyControl();
+			EatFood();
+			Sleep(60 - flag);
+			//防止退出
+		}
+	
+	
 	return 0;
 }
