@@ -4,8 +4,13 @@
 #include<stdlib.h>
 #include<graphics.h>
 
-int flag = 0;
+
+//定义文本指针
+char dataup[5];
+char datadowm[5];
+FILE* datapointer = NULL;
 int screen;
+int flag;
 
 //表示蛇宝宝的方向
 enum DIR
@@ -35,25 +40,41 @@ struct Food
 	DWORD color;
 }food;
 
+
+//读取data
+void ReadData()
+{
+	datapointer = fopen("data.txt", "w+");
+	if (datapointer == NULL)
+	{
+		printf("wrong");
+	}
+}
+
 //主页设置
 void HomePage()
 {
+	fgets(datadowm, 6, (FILE*)datapointer);
+	flag = atoi(datadowm);
+	remove("data.txt");
+	
 	
 	//主页页面设计
-	initgraph(640, 480, EX_DBLCLKS);
-	
-	//文字
-	wchar_t word1[] = L"按空格开始游戏";
+	initgraph(640, 480, EX_SHOWCONSOLE);
+
+	//开始说明
+	wchar_t word1[] = L"按 n键 开始游戏";
+	outtextxy(220, 240, word1);
+	//玩法介绍
 	wchar_t word2[] = L"上下左右键控制蛇宝宝";
 	wchar_t word3[] = L"按空格暂停";
-	outtextxy(220, 240, word1);
 	outtextxy(220, 280, word2);
 	outtextxy(220, 300, word3);
 
-	while(1)
+	while (1)
 		if (_kbhit())
 		{
-			if (_getch() == ' ')
+			if (_getch() == 'n')
 			{
 				cleardevice();
 				screen = 1;
@@ -69,17 +90,17 @@ void GameInit()
 	initgraph(640, 480);
 	//设置随机数种子
 	srand(GetTickCount());
-	
+
 	//初始化蛇宝宝
-	snake.size = 3;
+	snake.size = 3+flag;
 	snake.dir = RIGHT;
 	snake.speed = 10;
 	for (int i = 0; i < snake.size; i++)
 	{
-		snake.coor[i].x = 40 - 10*i;
+		snake.coor[i].x = 40 - 10 * i;
 		snake.coor[i].y = 10;
 	}
-	
+
 	//食物的初始化
 	food.x = rand() % 640;
 	food.y = rand() % 480;
@@ -112,8 +133,8 @@ void GameDraw()
 
 //让蛇宝宝动起来
 void SnakeMove()
-{	
-	for (int i = snake.size -1; i > 0; i--)
+{
+	for (int i = snake.size - 1; i > 0; i--)
 	{
 		snake.coor[i] = snake.coor[i - 1];
 	}
@@ -126,7 +147,7 @@ void SnakeMove()
 			snake.coor[0].y = 480;
 		}
 		break;
-	
+
 	case DOWN:
 		snake.coor[0].y += snake.speed;
 		if (snake.coor[0].y >= 480)
@@ -134,7 +155,7 @@ void SnakeMove()
 			snake.coor[0].y = 0;
 		}
 		break;
-	
+
 	case LEFT:
 		snake.coor[0].x -= snake.speed;
 		if (snake.coor[0].x <= 0)
@@ -142,7 +163,7 @@ void SnakeMove()
 			snake.coor[0].x = 640;
 		}
 		break;
-	
+
 	case RIGHT:
 		snake.coor[0].x += snake.speed;
 		if (snake.coor[0].x >= 640)
@@ -167,21 +188,21 @@ void KeyControl()
 				snake.dir = UP;
 			}
 			break;
-		
+
 		case 80:
 			if (snake.dir != UP)
 			{
 				snake.dir = DOWN;
 			}
 			break;
-		
+
 		case 75:
 			if (snake.dir != RIGHT)
 			{
 				snake.dir = LEFT;
 			}
 			break;
-		
+
 		case 77:
 			if (snake.dir != LEFT)
 			{
@@ -189,7 +210,7 @@ void KeyControl()
 			}
 			break;
 
-		case ' ': //游戏暂停逻辑
+		case ' ': //暂停游戏逻辑
 			while (1)
 			{
 				if (_getch() == ' ')
@@ -197,9 +218,14 @@ void KeyControl()
 					return;
 				}
 			}
-		case 27:
-			screen = 0;
-			break;
+		case 27: //退出游戏逻辑：按下esc并且处在游戏画面。自动存储flag至data.exe
+			if (screen == 1)
+			{
+				sprintf(dataup, "%d", flag);
+				fputs(dataup, datapointer);
+				screen = 0;
+				break;
+			}
 		}
 	}
 }
@@ -213,6 +239,8 @@ void EatFood()
 		food.flag = false;
 		snake.size++;
 		flag++;
+		printf("%d\n", flag);
+
 	}
 
 	if (!food.flag)
@@ -229,26 +257,28 @@ void EatFood()
 
 int main()
 {
+	screen = 0;
 	
-	HomePage(); 
+	ReadData();
+	HomePage();
 	GameInit();
 
 	while (1)
 		switch (screen)
 		{
-		case 0 :
+		case 0:
 			HomePage();
 			cleardevice();
-		case 1 :
-		
+		case 1:
+
 			GameDraw();
 			SnakeMove();
 			KeyControl();
 			EatFood();
-			Sleep(60 - flag);
+			Sleep(75 - flag);
 			//防止退出
 		}
-	
-	
+
+
 	return 0;
 }
