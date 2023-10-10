@@ -57,8 +57,8 @@ void HomePage()
 	fgets(datadowm, 6, (FILE*)datapointer);
 	flag = atoi(datadowm);
 	remove("data.txt");
-	
-	
+
+
 	//主页页面设计
 	initgraph(640, 480, EX_SHOWCONSOLE);
 
@@ -260,7 +260,6 @@ int main()
 	screen = 0;
 	
 	ReadData();
-	HomePage();
 	GameInit();
 
 	while (1)
